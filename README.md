@@ -44,7 +44,7 @@ It combines **classical sensor fusion algorithms** with **deep learning models**
 ## 📂 Dataset
 This project works with datasets that contain synchronized IMU readings.  
 Supported sources include:
-- [📦 TUM-VI Dataset](https://vision.in.tum.de/tumvi) (ROS bag files with IMU + ground truth)  
+- [📦 TUM-VI Dataset]([https://vision.in.tum.de/tumvi](https://cdn2.vision.in.tum.de/tumvi/calibrated/512_16/)) (ROS bag files with IMU + ground truth)  
 - Custom IMU recordings (CSV format)  
 
 ---
