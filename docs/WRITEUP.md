@@ -48,15 +48,19 @@ Per-method plots (estimate vs. ground truth, one figure per method) and a combin
 
 ## Results
 
-*(Fill in after running `main.py` on your machine — RMSE table and plots are generated automatically.)*
-
 | Method | Roll RMSE (deg) | Pitch RMSE (deg) | Yaw RMSE (deg) |
 |---|---|---|---|
-| Madgwick | — | — | — |
-| Mahony | — | — | — |
-| Kalman (EKF) | — | — | — |
-| Transformer | — | — | — |
-| LSTM | — | — | — |
+| Transformer | 1.15 | 0.60 | 1.67 |
+| LSTM | 1.40 | 1.32 | 2.74 |
+| Madgwick | 2.48 | 2.51 | 1.97 |
+| Mahony | 2.27 | 1.67 | 1.82 |
+| Kalman (EKF) | 3.24 | 5.29 | 28.77 |
+
+**Observations:**
+- The **Transformer** achieves the lowest error across all three axes, and by a wide margin on yaw — consistent with it having learned to exploit patterns in the windowed IMU stream (and, likely, the specific motion profile of this calibration sequence) that a hand-derived filter with fixed gains cannot adapt to.
+- **Madgwick and Mahony** perform comparably to each other on roll and pitch (~2–2.5°), which tracks with both being accelerometer/magnetometer-corrected complementary-style filters of similar design.
+- The **EKF's yaw error (28.77°) is a clear outlier** and the most informative negative result in the table. Roll and pitch are observable from the accelerometer's gravity reference, but yaw is only observable through the magnetometer correction — so a 10–15x larger yaw error relative to roll/pitch strongly suggests the magnetometer update is either poorly conditioned (e.g., an unmodeled hard/soft-iron disturbance, a bad world-frame reference assumption, or an issue in the finite-difference Jacobian for `update_mag`) rather than a fundamental limitation of EKF-based orientation tracking. This is the natural next debugging target before drawing conclusions about "classical filtering vs. learned models" in general.
+- The **learned models outperforming the classical filters here should be read with caution**: the Transformer and LSTM are trained and evaluated on the *same* sequence (no held-out trajectory), so part of their advantage may be sequence-specific memorization rather than a generalizable improvement. The classical filters, by contrast, are gain-tuned defaults with zero exposure to this specific trajectory. A fair generalization test would evaluate the learned models on a held-out TUM VI sequence (e.g., `room1` or a different `calib-cam` run) they were not trained on.
 
 ## Limitations and possible extensions
 
